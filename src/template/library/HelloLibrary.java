@@ -1,6 +1,11 @@
 package template.library;
 
 
+import org.tensorflow.DataType;
+import org.tensorflow.Graph;
+import org.tensorflow.Operation;
+import org.tensorflow.Tensor;
+
 import processing.core.*;
 
 /**
@@ -17,58 +22,58 @@ import processing.core.*;
 public class HelloLibrary {
 	
 	// myParent is a reference to the parent sketch
-	PApplet myParent;
-
-	int myVariable = 0;
+	
 	
 	public final static String VERSION = "##library.prettyVersion##";
 	
 
-	/**
-	 * a Constructor, usually called in the setup() method in your sketch to
-	 * initialize and start the Library.
-	 * 
-	 * @example Hello
-	 * @param theParent the parent PApplet
-	 */
-	public HelloLibrary(PApplet theParent) {
-		myParent = theParent;
-		welcome();
+	public static void main(String[] args) {
+		
+		createModel();
 	}
-	
-	
-	private void welcome() {
-		System.out.println("##library.name## ##library.prettyVersion## by ##author##");
+	public HelloLibrary(PApplet theParent) {
+		
+	}
+	public static void createModel() {
+		Graph graph=new Graph();
+		Operation a = graph.opBuilder("Const", "a")
+				  .setAttr("dtype", DataType.fromClass(Double.class))
+				  .setAttr("value", Tensor.<Double>create(3.0, Double.class))
+				  .build();     
+		Operation b = graph.opBuilder("Const", "b")
+				  .setAttr("dtype", DataType.fromClass(Double.class))
+				  .setAttr("value", Tensor.<Double>create(2.0, Double.class))
+				  .build();
+		Operation x = graph.opBuilder("Placeholder", "x")
+						  .setAttr("dtype", DataType.fromClass(Double.class))
+						  .build();         
+		Operation y = graph.opBuilder("Placeholder", "y")
+						  .setAttr("dtype", DataType.fromClass(Double.class))
+						  .build();		
+		Operation ax = graph.opBuilder("Mul", "ax")
+				  .addInput(a.output(0))
+				  .addInput(x.output(0))
+				  .build();         
+		Operation by = graph.opBuilder("Mul", "by")
+				  .addInput(b.output(0))
+				  .addInput(y.output(0))
+				  .build();
+		Operation z = graph.opBuilder("Add", "z")
+				  .addInput(ax.output(0))
+				  .addInput(by.output(0))
+				  .build();
+		System.out.println(z.output(0));
 	}
 	
 	
 	public String sayHello() {
 		return "hello library.";
 	}
-	/**
-	 * return the version of the Library.
-	 * 
-	 * @return String
-	 */
+	
 	public static String version() {
 		return VERSION;
 	}
 
-	/**
-	 * 
-	 * @param theA the width of test
-	 * @param theB the height of test
-	 */
-	public void setVariable(int theA, int theB) {
-		myVariable = theA + theB;
-	}
 
-	/**
-	 * 
-	 * @return int
-	 */
-	public int getVariable() {
-		return myVariable;
-	}
 }
 
